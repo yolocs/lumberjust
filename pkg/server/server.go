@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	expireWindow = 10 & time.Minute
+	expireWindow = 10 * time.Minute
 )
 
 type justificationClaims struct {
@@ -35,7 +35,6 @@ type Impl struct {
 	RMClient   *resourcemanager.Service
 	CredClient *cred.IamCredentialsClient
 
-	// https://stackoverflow.com/questions/65821436/programmatically-get-current-service-account-on-gcp
 	ServiceAccount string
 }
 
@@ -81,7 +80,7 @@ func (s *Impl) Justify(ctx context.Context, req *apis.JustificationRequest) (*ap
 	claims := justificationClaims{}
 	claims.Audience = req.Audience
 	// Cannot set issuer otherwise the request will be invalid.
-	// claims.Issuer = s.ServiceAccount // should be the service account
+	claims.Issuer = s.ServiceAccount // should be the service account
 	claims.IssuedAt = issueTime.Unix()
 	claims.ExpiresAt = issueTime.Add(expireWindow).Unix()
 	claims.NotBefore = issueTime.Unix()
